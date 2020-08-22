@@ -7,9 +7,12 @@ export type DepartmentGridProps = {
     id: string;
     name: string;
     employees: {
-      id: string;
-      name: string;
-    }[];
+      totalCount: number;
+      nodes: {
+        id: string;
+        name: string;
+      }[];
+    };
   }[];
 };
 

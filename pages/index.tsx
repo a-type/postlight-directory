@@ -1,5 +1,12 @@
 import Head from 'next/head';
-import { Container, Box, Button, TextField, debounce } from '@material-ui/core';
+import {
+  Container,
+  Box,
+  Button,
+  TextField,
+  debounce,
+  Typography,
+} from '@material-ui/core';
 import { Navigation } from '../components/Navigation';
 import { gql, useQuery } from '@apollo/client';
 import { EmployeeGrid } from '../components/EmployeeGrid';
@@ -9,10 +16,13 @@ import { useDebounce } from '../hooks/useDebounce';
 const EmployeesQuery = gql`
   query Employees($take: Int, $skip: Int, $search: String) {
     employees(take: $take, skip: $skip, search: $search) {
-      id
-      name
-      profileImageUrl
-      title
+      totalCount
+      nodes {
+        id
+        name
+        profileImageUrl
+        title
+      }
     }
   }
 `;
@@ -27,11 +37,14 @@ export default function Home() {
 
   const { data, fetchMore } = useQuery<{
     employees: {
-      id: string;
-      name: string;
-      profileImageUrl: string;
-      title: string;
-    }[];
+      totalCount: number;
+      nodes: {
+        id: string;
+        name: string;
+        profileImageUrl: string;
+        title: string;
+      }[];
+    };
   }>(EmployeesQuery, {
     variables: {
       take: 25,
@@ -39,8 +52,10 @@ export default function Home() {
       search: debouncedSearchTerm.length ? debouncedSearchTerm : undefined,
     },
   });
+  const employees = data?.employees.nodes ?? [];
+  const totalCount = data?.employees.totalCount ?? 0;
 
-  const currentCount = data?.employees.length ?? 0;
+  const currentCount = employees.length ?? 0;
 
   const getNextPage = useCallback(() => {
     fetchMore({
@@ -53,7 +68,13 @@ export default function Home() {
 
         return {
           ...prev,
-          employees: [...prev.employees, ...fetchMoreResult.employees],
+          employees: {
+            totalCount: fetchMoreResult.employees.totalCount,
+            nodes: [
+              ...prev.employees.nodes,
+              ...fetchMoreResult.employees.nodes,
+            ],
+          },
         };
       },
     });
@@ -75,13 +96,14 @@ export default function Home() {
           />
         </Box>
         <Box>
-          {data && (
-            <>
-              <EmployeeGrid employees={data.employees ?? []} />
-              <Button onClick={getNextPage} style={{ marginTop: 16 }}>
-                Show more
-              </Button>
-            </>
+          <Typography variant="h3" gutterBottom>
+            {totalCount} results
+          </Typography>
+          <EmployeeGrid employees={employees} />
+          {totalCount > currentCount && (
+            <Button onClick={getNextPage} style={{ marginTop: 16 }}>
+              Show more
+            </Button>
           )}
         </Box>
       </Container>

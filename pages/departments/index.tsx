@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Container, Box, TextField } from '@material-ui/core';
+import { Container, Box, TextField, Typography } from '@material-ui/core';
 import { Navigation } from '../../components/Navigation';
 import { useQuery, gql } from '@apollo/client';
 import { DepartmentGrid } from '../../components/DepartmentGrid';
@@ -9,12 +9,18 @@ import { useDebounce } from '../../hooks/useDebounce';
 const DepartmentsQuery = gql`
   query Departments($search: String) {
     departments(search: $search) {
-      id
-      name
-      # just showing a few employees in each dept for this view
-      employees(take: 10) {
+      totalCount
+      nodes {
         id
         name
+        # just showing a few employees in each dept for this view
+        employees(take: 10) {
+          totalCount
+          nodes {
+            id
+            name
+          }
+        }
       }
     }
   }
@@ -31,18 +37,27 @@ export default function Departments() {
 
   const { data } = useQuery<{
     departments: {
-      id: string;
-      name: string;
-      employees: {
+      totalCount: number;
+      nodes: {
         id: string;
         name: string;
+        employees: {
+          totalCount: number;
+          nodes: {
+            id: string;
+            name: string;
+          }[];
+        };
       }[];
-    }[];
+    };
   }>(DepartmentsQuery, {
     variables: {
       search: debouncedSearchTerm.length ? debouncedSearchTerm : undefined,
     },
   });
+
+  const departments = data?.departments.nodes ?? [];
+  const totalCount = data?.departments.totalCount;
 
   return (
     <>
@@ -60,7 +75,10 @@ export default function Departments() {
           />
         </Box>
         <Box>
-          {data && <DepartmentGrid departments={data.departments ?? []} />}
+          <Typography variant="h3" gutterBottom>
+            {totalCount} results
+          </Typography>
+          <DepartmentGrid departments={departments} />
         </Box>
       </Container>
     </>

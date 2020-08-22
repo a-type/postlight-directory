@@ -3,10 +3,24 @@ import { PrismaClient, Employee, Department } from '@prisma/client';
 
 const typeDefs = gql`
   type Query {
-    employees(search: String, take: Int = 25, skip: Int = 0): [Employee!]!
-    departments(search: String, take: Int = 10, skip: Int = 0): [Department!]!
+    employees(search: String, take: Int = 25, skip: Int = 0): EmployeeListResult
+    departments(
+      search: String
+      take: Int = 10
+      skip: Int = 0
+    ): DepartmentListResult
     department(id: String): Department
     employee(id: String): Employee
+  }
+
+  type EmployeeListResult {
+    totalCount: Int
+    nodes: [Employee!]!
+  }
+
+  type DepartmentListResult {
+    totalCount: Int
+    nodes: [Department!]!
   }
 
   type Employee {
@@ -21,7 +35,7 @@ const typeDefs = gql`
   type Department {
     id: ID!
     name: String!
-    employees(take: Int = 25, skip: Int = 0): [Employee!]!
+    employees(take: Int = 25, skip: Int = 0): EmployeeListResult
   }
 `;
 
@@ -29,7 +43,7 @@ const client = new PrismaClient();
 
 const resolvers = {
   Query: {
-    employees(
+    async employees(
       _parent,
       args: {
         search?: string;
@@ -37,7 +51,7 @@ const resolvers = {
         skip?: number;
       },
     ) {
-      return client.employee.findMany({
+      const filters = {
         where: args.search
           ? {
               OR: [
@@ -54,6 +68,10 @@ const resolvers = {
               ],
             }
           : undefined,
+      };
+
+      const nodes = await client.employee.findMany({
+        ...filters,
         // normally for a case like this I'd prefer cursor-based pagination, but I'm going
         // to go with the simpler offset-based just to keep things straightforward.
         take: args.take ?? 25,
@@ -62,21 +80,41 @@ const resolvers = {
           name: 'asc',
         },
       });
+      const totalCount = await client.employee.count({
+        ...filters,
+      });
+
+      return {
+        totalCount,
+        nodes,
+      };
     },
-    departments(
+    async departments(
       _parent,
       args: { search?: string; take?: number; skip?: number },
     ) {
-      return client.department.findMany({
+      const filters = {
         where: {
           ...(args.search ? { name: { contains: args.search } } : {}),
         },
+      };
+
+      const nodes = await client.department.findMany({
+        ...filters,
         take: args.take ?? 10,
         skip: args.skip ?? 0,
         orderBy: {
           name: 'asc',
         },
       });
+      const totalCount = await client.department.count({
+        ...filters,
+      });
+
+      return {
+        totalCount,
+        nodes,
+      };
     },
     department(_parent, args: { id: string }) {
       return client.department.findOne({
@@ -107,20 +145,35 @@ const resolvers = {
   },
 
   Department: {
-    employees(department: Department, args: { take?: number; skip?: number }) {
-      return client.department
+    async employees(
+      department: Department,
+      args: { take?: number; skip?: number },
+    ) {
+      // HACK ALERT - Prisma doesn't yet support counting the total number of related
+      // models. So instead, I'm just fetching all the models outright and then
+      // slicing them down. It's a *little* silly. Cursor-based pagination (like Relay)
+      // would be a better overall pattern for the kind of usage I have in the UI
+      // in a real production app. If this was a production app, I'd make that
+      // suggestion right about now - but for this exercise I don't think refactoring
+      // the whole pagination approach is really warranted.
+      const allEmployees = await client.department
         .findOne({
           where: {
             id: department.id,
           },
         })
         .employees({
-          take: args.take ?? 25,
-          skip: args.skip ?? 0,
           orderBy: {
             name: 'asc',
           },
         });
+      const totalCount = allEmployees.length;
+      const skip = args.skip ?? 0;
+      const nodes = allEmployees.slice(skip, skip + (args.take ?? 25));
+      return {
+        totalCount,
+        nodes,
+      };
     },
   },
 };

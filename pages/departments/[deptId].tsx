@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Container, Box, Button } from '@material-ui/core';
+import { Container, Box, Button, Typography } from '@material-ui/core';
 import { Navigation } from '../../components/Navigation';
 import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
@@ -10,11 +10,15 @@ const DepartmentEmployeesQuery = gql`
   query DepartmentEmployees($id: String, $take: Int, $skip: Int) {
     department(id: $id) {
       id
+      name
       employees(take: $take, skip: $skip) {
-        id
-        name
-        title
-        profileImageUrl
+        totalCount
+        nodes {
+          id
+          name
+          title
+          profileImageUrl
+        }
       }
     }
   }
@@ -27,12 +31,16 @@ export default function DepartmentEmployees() {
   const { data, fetchMore } = useQuery<{
     department: {
       id: string;
+      name: string;
       employees: {
-        id: string;
-        name: string;
-        title: string;
-        profileImageUrl: string;
-      }[];
+        totalCount: number;
+        nodes: {
+          id: string;
+          name: string;
+          title: string;
+          profileImageUrl: string;
+        }[];
+      };
     };
   }>(DepartmentEmployeesQuery, {
     variables: {
@@ -41,8 +49,10 @@ export default function DepartmentEmployees() {
       skip: 0,
     },
   });
+  const employees = data?.department.employees.nodes ?? [];
+  const totalCount = data?.department.employees.totalCount ?? 0;
 
-  const currentCount = data?.department.employees.length ?? 0;
+  const currentCount = employees.length ?? 0;
 
   const getNextPage = useCallback(() => {
     fetchMore({
@@ -57,10 +67,13 @@ export default function DepartmentEmployees() {
           ...prev,
           department: {
             ...prev.department,
-            employees: [
-              ...prev.department.employees,
-              ...fetchMoreResult.department.employees,
-            ],
+            employees: {
+              totalCount: fetchMoreResult.department.employees.totalCount,
+              nodes: [
+                ...prev.department.employees.nodes,
+                ...fetchMoreResult.department.employees.nodes,
+              ],
+            },
           },
         };
       },
@@ -75,13 +88,17 @@ export default function DepartmentEmployees() {
       <Navigation />
       <Container maxWidth="lg">
         <Box pt={3}>
-          {data && (
-            <>
-              <EmployeeGrid employees={data.department?.employees ?? []} />
-              <Button onClick={getNextPage} style={{ marginTop: 16 }}>
-                Show more
-              </Button>
-            </>
+          <Typography variant="h2" gutterBottom>
+            {data?.department.name ?? 'Loading'}
+          </Typography>
+          <Typography variant="h3" gutterBottom>
+            {totalCount} members
+          </Typography>
+          <EmployeeGrid employees={employees} />
+          {totalCount > currentCount && (
+            <Button onClick={getNextPage} style={{ marginTop: 16 }}>
+              Show more
+            </Button>
           )}
         </Box>
       </Container>

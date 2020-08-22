@@ -14,9 +14,12 @@ export type DepartmentCardProps = {
     id: string;
     name: string;
     employees: {
-      id: string;
-      name: string;
-    }[];
+      totalCount: number;
+      nodes: {
+        id: string;
+        name: string;
+      }[];
+    };
   };
 };
 
@@ -36,14 +39,19 @@ export function DepartmentCard({ department }: DepartmentCardProps) {
         <CardActionArea>
           <CardHeader title={department.name} />
           <CardContent>
-            {department.employees.map((employee) => (
+            {department.employees.nodes.map((employee) => (
               <Chip
                 key={employee.id}
                 label={employee.name}
                 className={classes.chip}
               />
             ))}
-            <span>... and more</span>
+            <span>
+              ... and{' '}
+              {department.employees.totalCount -
+                department.employees.nodes.length}{' '}
+              more
+            </span>
           </CardContent>
         </CardActionArea>
       </Link>
