@@ -1,5 +1,6 @@
 import { ApolloServer, gql } from 'apollo-server-micro';
 import { PrismaClient, Employee, Department } from '@prisma/client';
+import { internet } from 'faker';
 
 const typeDefs = gql`
   type Query {
@@ -36,6 +37,17 @@ const typeDefs = gql`
     id: ID!
     name: String!
     employees(take: Int = 25, skip: Int = 0): EmployeeListResult
+  }
+
+  type Mutation {
+    createEmployee(input: CreateEmployeeInput!): Employee!
+  }
+
+  input CreateEmployeeInput {
+    name: String!
+    title: String!
+    location: String!
+    departmentId: String!
   }
 `;
 
@@ -127,6 +139,36 @@ const resolvers = {
       return client.employee.findOne({
         where: {
           id: args.id,
+        },
+      });
+    },
+  },
+
+  Mutation: {
+    createEmployee(
+      _parent,
+      {
+        input,
+      }: {
+        input: {
+          name: string;
+          title: string;
+          location: string;
+          departmentId: string;
+        };
+      },
+    ) {
+      return client.employee.create({
+        data: {
+          name: input.name,
+          title: input.title,
+          location: input.location,
+          profileImageUrl: internet.avatar(),
+          department: {
+            connect: {
+              id: input.departmentId,
+            },
+          },
         },
       });
     },

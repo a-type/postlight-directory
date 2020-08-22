@@ -4,8 +4,10 @@ import {
   Toolbar,
   Typography,
   makeStyles,
-  Button,
+  IconButton,
+  Tooltip,
 } from '@material-ui/core';
+import { PersonAdd, Business } from '@material-ui/icons';
 import Link from 'next/link';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,10 +34,19 @@ export function Navigation() {
             Socient
           </Typography>
         </Link>
+        <Link href="/employees/create">
+          <Tooltip title="Add employee">
+            <IconButton color="inherit">
+              <PersonAdd />
+            </IconButton>
+          </Tooltip>
+        </Link>
         <Link href="/departments">
-          <Button color="inherit" href="/departments">
-            Departments
-          </Button>
+          <Tooltip title="Departments">
+            <IconButton color="inherit">
+              <Business />
+            </IconButton>
+          </Tooltip>
         </Link>
       </Toolbar>
     </AppBar>

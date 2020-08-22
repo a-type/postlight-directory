@@ -4,6 +4,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../theme/theme';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useEffect } from 'react';
+import Head from 'next/head';
 
 const client = new ApolloClient({
   uri: 'http://localhost:3000/api/graphql',
@@ -20,12 +21,17 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </ApolloProvider>
+    <>
+      <Head>
+        <title>Socient</title>
+      </Head>
+      <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </ApolloProvider>
+    </>
   );
 }
 
