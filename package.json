@@ -1,0 +1,30 @@
+{
+  "name": "postlight-directory",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:init": "prisma migrate save --experimental",
+    "db:up": "prisma migrate up --experimental",
+    "db:seed": "node ./prisma/seed.js",
+    "prisma:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@prisma/client": "^2.5.1",
+    "apollo-server-micro": "^2.16.1",
+    "next": "9.5.2",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "urql": "^1.10.0"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.5.1",
+    "@types/react": "^16.9.46",
+    "faker": "^4.1.0",
+    "typescript": "^4.0.2"
+  }
+}
