@@ -35,7 +35,7 @@ export default function Departments() {
     500,
   );
 
-  const { data } = useQuery<{
+  const { data, loading } = useQuery<{
     departments: {
       totalCount: number;
       nodes: {
@@ -78,7 +78,10 @@ export default function Departments() {
           <Typography variant="h3" gutterBottom>
             {totalCount} results
           </Typography>
-          <DepartmentGrid departments={departments} />
+          <DepartmentGrid
+            departments={departments}
+            initializing={!data && loading}
+          />
         </Box>
       </Container>
     </>

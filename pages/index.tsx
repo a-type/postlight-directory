@@ -34,7 +34,7 @@ export default function Home() {
     500,
   );
 
-  const { data, fetchMore } = useQuery<{
+  const { data, fetchMore, loading } = useQuery<{
     employees: {
       totalCount: number;
       nodes: {
@@ -98,7 +98,7 @@ export default function Home() {
           <Typography variant="h3" gutterBottom>
             {totalCount} results
           </Typography>
-          <EmployeeGrid employees={employees} />
+          <EmployeeGrid employees={employees} initializing={!data && loading} />
           {totalCount > currentCount && (
             <Button onClick={getNextPage} style={{ marginTop: 16 }}>
               Show more

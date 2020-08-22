@@ -28,7 +28,7 @@ export default function DepartmentEmployees() {
   const router = useRouter();
   const { deptId: departmentId } = router.query;
 
-  const { data, fetchMore } = useQuery<{
+  const { data, fetchMore, loading } = useQuery<{
     department: {
       id: string;
       name: string;
@@ -94,7 +94,7 @@ export default function DepartmentEmployees() {
           <Typography variant="h3" gutterBottom>
             {totalCount} members
           </Typography>
-          <EmployeeGrid employees={employees} />
+          <EmployeeGrid employees={employees} initializing={!data && loading} />
           {totalCount > currentCount && (
             <Button onClick={getNextPage} style={{ marginTop: 16 }}>
               Show more
