@@ -3,6 +3,7 @@ import { CssBaseline } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../theme/theme';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { SnackbarProvider } from 'notistack';
 import { useEffect } from 'react';
 import Head from 'next/head';
 
@@ -27,8 +28,10 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <ApolloProvider client={client}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Component {...pageProps} />
+          <SnackbarProvider>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </SnackbarProvider>
         </ThemeProvider>
       </ApolloProvider>
     </>

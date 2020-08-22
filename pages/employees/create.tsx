@@ -5,6 +5,7 @@ import { Container, Box, Typography } from '@material-ui/core';
 import { EmployeeCreateForm } from '../../components/EmployeeCreateForm';
 import { Navigation } from '../../components/Navigation';
 import { useRouter } from 'next/router';
+import { useSnackbar } from 'notistack';
 
 export type CreateEmployeeProps = {};
 
@@ -35,6 +36,8 @@ export default function CreateEmployee() {
     departments: { nodes: { id: string; name: string }[] };
   }>(DepartmentsQuery);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleSubmit = React.useCallback(
     async (data: {
       name: string;
@@ -53,9 +56,12 @@ export default function CreateEmployee() {
         await router.push('/employees/[empId]', `/employees/${employeeId}`);
       } catch (err) {
         console.error(err);
+        enqueueSnackbar('Failed to create employee - try again?', {
+          variant: 'error',
+        });
       }
     },
-    [mutate],
+    [mutate, enqueueSnackbar],
   );
 
   return (

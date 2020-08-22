@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Formik, FastField } from 'formik';
-import { TextField, Select, MenuItem, Button } from '@material-ui/core';
+import { Formik, FastField, Field } from 'formik';
+import { TextField, MenuItem, Button } from '@material-ui/core';
 
 export type EmployeeCreateFormProps = {
   onSubmit: (data: {
@@ -48,7 +48,7 @@ export function EmployeeCreateForm({
                 />
               )}
             </FastField>
-            <FastField name="departmentId">
+            <Field name="departmentId">
               {({ field }) => (
                 <TextField
                   select
@@ -64,7 +64,7 @@ export function EmployeeCreateForm({
                   ))}
                 </TextField>
               )}
-            </FastField>
+            </Field>
           </div>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             Create
