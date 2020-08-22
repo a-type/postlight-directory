@@ -21,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
   avatar: {},
 }));
 
+/**
+ * Displays concise data about an employee. Clicking it will visit the employee
+ * page.
+ */
 export function EmployeeCard({ employee }: EmployeeCardProps) {
   const classes = useStyles();
 

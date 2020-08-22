@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/**
+ * Global navigation bar for the whole app
+ */
 export function Navigation() {
   const classes = useStyles();
 

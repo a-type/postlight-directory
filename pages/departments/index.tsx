@@ -35,6 +35,7 @@ export default function Departments() {
     500,
   );
 
+  // fetches a list of departments matching the filter
   const { data, loading } = useQuery<{
     departments: {
       totalCount: number;

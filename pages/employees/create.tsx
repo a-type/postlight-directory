@@ -32,12 +32,14 @@ export default function CreateEmployee() {
   const router = useRouter();
 
   const [mutate] = useMutation(CreateEmployeeMutation);
+  // we need department names and ids for the form select
   const { data } = useQuery<{
     departments: { nodes: { id: string; name: string }[] };
   }>(DepartmentsQuery);
 
   const { enqueueSnackbar } = useSnackbar();
 
+  // creates a new employee and redirects to their page
   const handleSubmit = React.useCallback(
     async (data: {
       name: string;

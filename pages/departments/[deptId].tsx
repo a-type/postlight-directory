@@ -28,6 +28,8 @@ export default function DepartmentEmployees() {
   const router = useRouter();
   const { deptId: departmentId } = router.query;
 
+  // fetches department data, including related employees. employee list
+  // can be paginated
   const { data, fetchMore, loading } = useQuery<{
     department: {
       id: string;
@@ -49,11 +51,13 @@ export default function DepartmentEmployees() {
       skip: 0,
     },
   });
+
   const employees = data?.department.employees.nodes ?? [];
   const totalCount = data?.department.employees.totalCount ?? 0;
 
   const currentCount = employees.length ?? 0;
 
+  // fetches a new page of employees and appends it to the list
   const getNextPage = useCallback(() => {
     fetchMore({
       variables: {

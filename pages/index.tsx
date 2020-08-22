@@ -9,7 +9,7 @@ import {
 import { Navigation } from '../components/Navigation';
 import { gql, useQuery } from '@apollo/client';
 import { EmployeeGrid } from '../components/EmployeeGrid';
-import { useCallback, useState, useMemo, ChangeEvent } from 'react';
+import { useCallback, useState } from 'react';
 import { useDebounce } from '../hooks/useDebounce';
 
 const EmployeesQuery = gql`
@@ -34,6 +34,7 @@ export default function Home() {
     500,
   );
 
+  // fetches a list of employees that match the filter. allows pagination.
   const { data, fetchMore, loading } = useQuery<{
     employees: {
       totalCount: number;
@@ -51,11 +52,14 @@ export default function Home() {
       search: debouncedSearchTerm.length ? debouncedSearchTerm : undefined,
     },
   });
+
   const employees = data?.employees.nodes ?? [];
   const totalCount = data?.employees.totalCount ?? 0;
 
   const currentCount = employees.length ?? 0;
 
+  // fetches the next page of employees matching the filter and appends them
+  // to the list
   const getNextPage = useCallback(() => {
     fetchMore({
       variables: {

@@ -13,6 +13,9 @@ export type EmployeeGridProps = {
   initializing: boolean;
 };
 
+/**
+ * Renders a list of employees in a responsive grid.
+ */
 export function EmployeeGrid({ employees, initializing }: EmployeeGridProps) {
   if (initializing) {
     return (

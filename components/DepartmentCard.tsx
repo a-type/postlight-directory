@@ -30,6 +30,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/**
+ * Displays concise information about a department. Clicking it will open the
+ * department page.
+ */
 export function DepartmentCard({ department }: DepartmentCardProps) {
   const classes = useStyles();
 

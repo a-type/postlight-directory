@@ -18,6 +18,9 @@ export type DepartmentGridProps = {
   initializing: boolean;
 };
 
+/**
+ * Renders a list of departments in a responsive grid.
+ */
 export function DepartmentGrid({
   departments,
   initializing,

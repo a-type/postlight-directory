@@ -33,6 +33,7 @@ export default function DepartmentEmployees() {
   const router = useRouter();
   const { empId: employeeId } = router.query;
 
+  // fetches data for an individual employee, including their department
   const { data, error } = useQuery<{
     employee: {
       id: string;
