@@ -14,7 +14,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 2. Other CRUD mutations - deleting, updating, etc.
 3. A bit more visual polish certainly wouldn't hurt.
 
-But, since I'd already spent about 9 hours, I decided to call it here.
+But, since I'd already spent about 8 hours, I decided to call it here.
 
 ## Running the app
 
