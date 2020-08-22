@@ -10,6 +10,7 @@
     "db:up": "prisma migrate up --experimental",
     "db:seed": "node ./prisma/seed.js",
     "prisma:generate": "prisma generate",
+    "setup": "npm run db:init && npm run db:up && npm run db:seed && npm run prisma:generate",
     "test": "jest"
   },
   "dependencies": {

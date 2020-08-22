@@ -4,11 +4,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ### Setting up the backend
 
-Run `npm run db:up` to migrate the database. This will ask you if you want to create a new SQLite database, choose `Yes`.
-
-Then, run `npm run prisma:generate` to generate the Prisma client used in the API.
-
-Finally, seed the database using `npm run db:seed`. It can take a few minutes. If this doesn't work, send me an email and I can just send you a premade SQLite database file.
+Run `npm run setup`. This will create a SQLite database, run migrations, and seed it. Then it will generate the Prisma client used in the backend. Answer "Yes" to any prompts and/or accept any default values. Seeding can take a while. If it fails, email me and I'll send a premade database file.
 
 ### Running the app
 

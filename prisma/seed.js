@@ -22,31 +22,41 @@ async function seed() {
     // using for-loops to avoid overloading the database with hundreds of parallel queries
     const departmentModels = [];
     for (let dept of departments) {
-      const departmentModel = await client.department.create({
-        data: {
-          name: dept,
-        },
-      });
-      departmentModels.push(departmentModel);
+      try {
+        const departmentModel = await client.department.create({
+          data: {
+            name: dept,
+          },
+        });
+        departmentModels.push(departmentModel);
+      } catch (err) {
+        console.warn(err);
+        console.warn('Ignoring that and continuing...');
+      }
     }
 
     const employeeModels = [];
     for (let emp of employees) {
-      const employeeModel = await client.employee.create({
-        data: {
-          ...emp,
-          department: {
-            connect: {
-              // choosing a random department
-              id:
-                departmentModels[
-                  Math.floor(Math.random() * departmentModels.length)
-                ].id,
+      try {
+        const employeeModel = await client.employee.create({
+          data: {
+            ...emp,
+            department: {
+              connect: {
+                // choosing a random department
+                id:
+                  departmentModels[
+                    Math.floor(Math.random() * departmentModels.length)
+                  ].id,
+              },
             },
           },
-        },
-      });
-      employeeModels.push(employeeModel);
+        });
+        employeeModels.push(employeeModel);
+      } catch (err) {
+        console.warn(err);
+        console.warn('Ignoring that and continuing...');
+      }
     }
 
     console.info(
