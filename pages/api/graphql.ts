@@ -14,6 +14,8 @@ const typeDefs = gql`
       take: Int = 10
       skip: Int = 0
     ): [Department!]!
+    department(id: String): Department
+    employee(id: String): Employee
   }
 
   type Employee {
@@ -22,12 +24,13 @@ const typeDefs = gql`
     profileImageUrl: String!
     department: Department!
     title: String!
+    location: String
   }
 
   type Department {
     id: ID!
     name: String!
-    employees: [Employee!]!
+    employees(take: Int = 25, skip: Int = 0): [Employee!]!
   }
 `;
 
@@ -60,7 +63,7 @@ const resolvers = {
         },
       });
     },
-    async departments(
+    departments(
       _parent,
       args: { nameFilter?: string; take?: number; skip?: number },
     ) {
@@ -75,9 +78,22 @@ const resolvers = {
         },
       });
     },
+    department(_parent, args: { id: string }) {
+      return client.department.findOne({
+        where: {
+          id: args.id,
+        },
+      });
+    },
+    employee(_parent, args: { id: string }) {
+      return client.employee.findOne({
+        where: {
+          id: args.id,
+        },
+      });
+    },
   },
 
-  // TODO; add pagination to these connections
   Employee: {
     department(employee: Employee) {
       return client.employee
@@ -91,14 +107,20 @@ const resolvers = {
   },
 
   Department: {
-    employees(department: Department) {
+    employees(department: Department, args: { take?: number; skip?: number }) {
       return client.department
         .findOne({
           where: {
             id: department.id,
           },
         })
-        .employees();
+        .employees({
+          take: args.take ?? 25,
+          skip: args.skip ?? 0,
+          orderBy: {
+            name: 'asc',
+          },
+        });
     },
   },
 };

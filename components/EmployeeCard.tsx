@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Card, CardHeader, Avatar, makeStyles } from '@material-ui/core';
+import {
+  Card,
+  CardHeader,
+  Avatar,
+  makeStyles,
+  CardActionArea,
+} from '@material-ui/core';
+import Link from 'next/link';
 
 export type EmployeeCardProps = {
   employee: {
@@ -19,13 +26,20 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
 
   return (
     <Card>
-      <CardHeader
-        title={employee.name}
-        subheader={employee.title}
-        avatar={
-          <Avatar src={employee.profileImageUrl} className={classes.avatar} />
-        }
-      />
+      <Link href="/employees/[empId]" as={`/employees/${employee.id}`}>
+        <CardActionArea>
+          <CardHeader
+            title={employee.name}
+            subheader={employee.title}
+            avatar={
+              <Avatar
+                src={employee.profileImageUrl}
+                className={classes.avatar}
+              />
+            }
+          />
+        </CardActionArea>
+      </Link>
     </Card>
   );
 }

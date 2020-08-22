@@ -2,9 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const faker = require('faker');
 
 // these have to be unique... just using a Set for now to do that. This means
-// there may not be 40 total departments, but that's ok.
+// there may not be 10 total departments, but that's ok.
 const departments = Array.from(
-  new Set(new Array(40).fill(null).map(() => faker.name.jobArea())),
+  new Set(new Array(10).fill(null).map(() => faker.name.jobArea())),
 );
 
 const employees = new Array(500).fill(null).map(() => ({
