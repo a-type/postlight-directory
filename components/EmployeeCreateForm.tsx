@@ -19,23 +19,40 @@ const initialValues = {
   departmentId: '',
 };
 
+/**
+ * Renders a form to create an employee with all required fields
+ */
 export function EmployeeCreateForm({
   onSubmit,
   departments,
 }: EmployeeCreateFormProps) {
   return (
     <Formik onSubmit={onSubmit} initialValues={initialValues}>
-      {({ handleSubmit, isSubmitting }) => (
+      {({ handleSubmit, isSubmitting, isValid }) => (
         <form onSubmit={handleSubmit}>
           <div>
             <FastField name="name">
               {({ field }) => (
-                <TextField label="Name" margin="normal" fullWidth {...field} />
+                <TextField
+                  label="Name"
+                  margin="normal"
+                  fullWidth
+                  required
+                  id="createField-name"
+                  {...field}
+                />
               )}
             </FastField>
             <FastField name="title">
               {({ field }) => (
-                <TextField label="Title" margin="normal" fullWidth {...field} />
+                <TextField
+                  label="Title"
+                  margin="normal"
+                  fullWidth
+                  required
+                  id="createField-title"
+                  {...field}
+                />
               )}
             </FastField>
             <FastField name="location">
@@ -44,6 +61,8 @@ export function EmployeeCreateForm({
                   label="Location"
                   margin="normal"
                   fullWidth
+                  required
+                  id="createField-location"
                   {...field}
                 />
               )}
@@ -55,6 +74,8 @@ export function EmployeeCreateForm({
                   label="Department"
                   margin="normal"
                   fullWidth
+                  required
+                  id="createField-department"
                   {...field}
                 >
                   {departments.map((dept) => (
@@ -66,7 +87,11 @@ export function EmployeeCreateForm({
               )}
             </Field>
           </div>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting || !isValid}
+          >
             Create
           </Button>
         </form>
