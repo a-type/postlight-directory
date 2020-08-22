@@ -1,13 +1,14 @@
 import Head from 'next/head';
-import { Container, Box, Button } from '@material-ui/core';
+import { Container, Box, Button, TextField, debounce } from '@material-ui/core';
 import { Navigation } from '../components/Navigation';
 import { gql, useQuery } from '@apollo/client';
 import { EmployeeGrid } from '../components/EmployeeGrid';
-import { useCallback } from 'react';
+import { useCallback, useState, useMemo, ChangeEvent } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
 
 const EmployeesQuery = gql`
-  query Employees($take: Int, $skip: Int) {
-    employees(take: $take, skip: $skip) {
+  query Employees($take: Int, $skip: Int, $search: String) {
+    employees(take: $take, skip: $skip, search: $search) {
       id
       name
       profileImageUrl
@@ -16,6 +17,14 @@ const EmployeesQuery = gql`
   }
 `;
 export default function Home() {
+  const [searchTerm, setSearchTerm] = useState('');
+  // debounce the changes to the value before using it as a search filter,
+  // also dropping anything with less than 2 chars
+  const debouncedSearchTerm = useDebounce(
+    searchTerm.length > 2 ? searchTerm : '',
+    500,
+  );
+
   const { data, fetchMore } = useQuery<{
     employees: {
       id: string;
@@ -27,6 +36,7 @@ export default function Home() {
     variables: {
       take: 25,
       skip: 0,
+      search: debouncedSearchTerm.length ? debouncedSearchTerm : undefined,
     },
   });
 
@@ -56,11 +66,21 @@ export default function Home() {
       </Head>
       <Navigation />
       <Container maxWidth="lg">
-        <Box pt={3}>
+        <Box my={3} pt={3}>
+          <TextField
+            label="Search employees"
+            placeholder="Name or title"
+            onChange={(ev) => setSearchTerm(ev.target.value)}
+            value={searchTerm}
+          />
+        </Box>
+        <Box>
           {data && (
             <>
               <EmployeeGrid employees={data.employees ?? []} />
-              <Button onClick={getNextPage}>Show more</Button>
+              <Button onClick={getNextPage} style={{ marginTop: 16 }}>
+                Show more
+              </Button>
             </>
           )}
         </Box>

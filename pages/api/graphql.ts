@@ -3,17 +3,8 @@ import { PrismaClient, Employee, Department } from '@prisma/client';
 
 const typeDefs = gql`
   type Query {
-    employees(
-      nameFilter: String
-      titleFilter: String
-      take: Int = 25
-      skip: Int = 0
-    ): [Employee!]!
-    departments(
-      nameFilter: String
-      take: Int = 10
-      skip: Int = 0
-    ): [Department!]!
+    employees(search: String, take: Int = 25, skip: Int = 0): [Employee!]!
+    departments(search: String, take: Int = 10, skip: Int = 0): [Department!]!
     department(id: String): Department
     employee(id: String): Employee
   }
@@ -41,19 +32,28 @@ const resolvers = {
     employees(
       _parent,
       args: {
-        nameFilter?: string;
-        titleFilter?: string;
+        search?: string;
         take?: number;
         skip?: number;
       },
     ) {
       return client.employee.findMany({
-        where: {
-          ...(args.nameFilter ? { name: { contains: args.nameFilter } } : {}),
-          ...(args.titleFilter
-            ? { title: { contains: args.titleFilter } }
-            : {}),
-        },
+        where: args.search
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: args.search,
+                  },
+                },
+                {
+                  title: {
+                    contains: args.search,
+                  },
+                },
+              ],
+            }
+          : undefined,
         // normally for a case like this I'd prefer cursor-based pagination, but I'm going
         // to go with the simpler offset-based just to keep things straightforward.
         take: args.take ?? 25,
@@ -65,11 +65,11 @@ const resolvers = {
     },
     departments(
       _parent,
-      args: { nameFilter?: string; take?: number; skip?: number },
+      args: { search?: string; take?: number; skip?: number },
     ) {
       return client.department.findMany({
         where: {
-          ...(args.nameFilter ? { name: { contains: args.nameFilter } } : {}),
+          ...(args.search ? { name: { contains: args.search } } : {}),
         },
         take: args.take ?? 10,
         skip: args.skip ?? 0,

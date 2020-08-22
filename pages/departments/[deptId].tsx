@@ -78,7 +78,9 @@ export default function DepartmentEmployees() {
           {data && (
             <>
               <EmployeeGrid employees={data.department?.employees ?? []} />
-              <Button onClick={getNextPage}>Show more</Button>
+              <Button onClick={getNextPage} style={{ marginTop: 16 }}>
+                Show more
+              </Button>
             </>
           )}
         </Box>
